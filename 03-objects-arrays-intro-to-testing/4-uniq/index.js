@@ -4,11 +4,6 @@
  * @returns {*[]} - the new array with uniq values
  */
 export function uniq(arr = []) {
-  let uniqList = new Set();
-  let unicArr = [];
-  arr.forEach(function(item, i, arr) {
-    uniqList.add(item)
-  });
-  for (let value of uniqList) unicArr.push(value);
-  return unicArr;
+  let uniqList = new Set(arr);
+  return [...uniqList];
 }
