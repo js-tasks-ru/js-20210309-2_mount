@@ -17,7 +17,7 @@ export default class ColumnChart {
     if (!this.data.length){ return 'column-chart_loading '}; 
   }
   render() {
-    const element = document.createElement('div'); // (*)
+    const element = document.createElement('div');
     element.innerHTML = `
     <div class="column-chart ${this.emptyData()}" style="--chart-height: 50">
       <div class="column-chart__title">
@@ -32,8 +32,6 @@ export default class ColumnChart {
     </div>
     `;
     this.classCollectElems(element.querySelectorAll('div'))
-    // NOTE: в этой строке мы избавляемся от обертки-пустышки в виде `div`
-    // который мы создали на строке (*)
     this.element = element.firstElementChild;
   }
   classCollectElems(element){
@@ -45,12 +43,18 @@ export default class ColumnChart {
     this.drawColumns(this.data,this.classCollect)
   }
   drawColumns(data,parentElem){
-    const columsList = [];
-    for (const [key, value] of Object.entries(data)) {
-      const currentHeight = Math.floor(this.chartHeight/100 * value);
-      const percent = (100 * currentHeight / this.chartHeight).toFixed(0);
-      columsList.push(`<div style="--value: ${String(currentHeight)}" data-tooltip="${percent}%"></div>`)
-      parentElem.body.innerHTML = columsList.join('');
+    const maxValue = Math.max(...data);
+    const scale = 50 / maxValue;
+    const columnListToGo = [];
+    const columsList = data.map(item => {
+      return {
+        percent: (item / maxValue * 100).toFixed(0) + '%',
+        value: String(Math.floor(item * scale))
+      };
+    });
+    for (let column in columsList) {
+      columnListToGo.push(`<div style="--value: ${columsList[column].value}" data-tooltip="${columsList[column].percent}"></div>`)
+      parentElem.body.innerHTML = columnListToGo.join('');
     }
   };
   update(newData){
@@ -61,6 +65,5 @@ export default class ColumnChart {
   }
   destroy() {
     this.remove();
-    // NOTE: удаляем обработчики событий, если они есть
   }
 }
